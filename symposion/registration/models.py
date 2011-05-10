@@ -13,14 +13,14 @@ class Registrant(models.Model):
     TSHIRT_W_XL = 9
     TSHIRTS = (
         (TSHIRT_M_S, "Men's Small"),
-        (TSHIRT_M_S, "Men's Medium"),
-        (TSHIRT_M_S, "Men's Large"),
-        (TSHIRT_M_S, "Men's Extra Large"),
-        (TSHIRT_M_S, "Men's 2X Large"),
-        (TSHIRT_M_S, "Women's Small"),
-        (TSHIRT_M_S, "Women's Medium"),
-        (TSHIRT_M_S, "Women's Large"),
-        (TSHIRT_M_S, "Women's Extra Large"),
+        (TSHIRT_M_M, "Men's Medium"),
+        (TSHIRT_M_L, "Men's Large"),
+        (TSHIRT_M_XL, "Men's Extra Large"),
+        (TSHIRT_M_XXL, "Men's 2X Large"),
+        (TSHIRT_W_S, "Women's Small"),
+        (TSHIRT_W_M, "Women's Medium"),
+        (TSHIRT_W_L, "Women's Large"),
+        (TSHIRT_W_XL, "Women's Extra Large"),
     )
 
     user = models.ForeignKey(User, null=True)
