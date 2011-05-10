@@ -12,7 +12,7 @@ from biblion import creole_parser
 
 from proposals.models import Proposal
 
-from schedule.models import Presentation
+from symposion.schedule.models import Presentation
 
 
 class ProposalScoreExpression(object):
