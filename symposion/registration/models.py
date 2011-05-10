@@ -29,3 +29,4 @@ class Registrant(models.Model):
     email = models.EmailField()
     will_buy_tshirt = models.BooleanField("I would buy a T-Shirt", default=True, help_text="We're looking for a T-shirt sponsor, but if we don't get one, we'll be asking for cash.")
     tshirt_size = models.SmallIntegerField("T-Shirt Size", choices=TSHIRTS)
+    location = models.CharField(max_length=128, blank=True, null=True)
