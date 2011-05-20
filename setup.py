@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "symposion",
-    version = "1.0a1.kct.dev6", # I know this breaks conventions, sorry.
+    version = "1.0a1.kct.dev7", # I know this breaks conventions, sorry.
     description = "collection of Pinax apps for conferences",
     url = "https://github.com/pinax/symposion",
     author = "Brian Rosner",
