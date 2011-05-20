@@ -8,6 +8,8 @@ from django.contrib.contenttypes.models import ContentType
 
 from biblion import creole_parser
 
+from symposion.proposals.models import ProposalKind
+
 
 class Track(models.Model):
     
@@ -107,22 +109,14 @@ class Slot(models.Model):
         self.save()
     
     def __unicode__(self):
-        return u"%s: %s — %s" % (self.start.strftime("%a"), self.start.strftime("%X"), self.end.strftime("%X"))
+        return u"%s %s: %s — %s" % (
+            self.start.strftime("%a"),
+            self.start.strftime("%X"),
+            self.end.strftime("%X")
+        )
 
 
 class Presentation(models.Model):
-    
-    PRESENTATION_TYPE_TALK = 1
-    PRESENTATION_TYPE_PANEL = 2
-    PRESENTATION_TYPE_TUTORIAL = 3
-    PRESENTATION_TYPE_POSTER = 4
-    
-    PRESENTATION_TYPES = [
-        (PRESENTATION_TYPE_TALK, "Talk"),
-        (PRESENTATION_TYPE_PANEL, "Panel"),
-        (PRESENTATION_TYPE_TUTORIAL, "Tutorial"),
-        (PRESENTATION_TYPE_POSTER, "Poster")
-    ]
     
     AUDIENCE_LEVEL_NOVICE = 1
     AUDIENCE_LEVEL_EXPERIENCED = 2
@@ -139,7 +133,7 @@ class Presentation(models.Model):
         max_length = 400, # @@@ need to enforce 400 in UI
         help_text = "Brief one paragraph blurb (will be public if accepted). Must be 400 characters or less"
     )
-    presentation_type = models.IntegerField(choices=PRESENTATION_TYPES)
+    presentation_type = models.ForeignKey(ProposalKind)
     abstract = models.TextField(
         help_text = "More detailed description (will be public if accepted). You can use <a href='http://wikicreole.org/' target='_blank'>creole</a> markup. <a id='preview' href='#'>Preview</a>",
     )
@@ -153,8 +147,6 @@ class Presentation(models.Model):
     speaker = models.ForeignKey("speakers.Speaker", related_name="sessions")
     additional_speakers = models.ManyToManyField("speakers.Speaker", blank=True)
     cancelled = models.BooleanField(default=False)
-    
-    extreme_pycon = models.BooleanField(u"EXTREME PyCon!", default=False)
     invited = models.BooleanField(default=False)
     
     def save(self, *args, **kwargs):

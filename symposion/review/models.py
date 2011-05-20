@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 
 from biblion import creole_parser
 
-from proposals.models import Proposal
+from symposion.proposals.models import Proposal
 
 from symposion.schedule.models import Presentation
 
@@ -298,12 +298,11 @@ def promote_proposal(proposal):
         defaults=dict(
             title=proposal.title,
             description=proposal.description,
-            presentation_type=proposal.session_type,
+            presentation_type=proposal.kind,
             abstract=proposal.abstract,
             audience_level=proposal.audience_level,
             submitted=proposal.submitted,
             speaker=proposal.speaker,
-            extreme_pycon=proposal.extreme_pycon,
             invited=proposal.invited,
         )
     )

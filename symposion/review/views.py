@@ -1,4 +1,3 @@
-from django.db.models import Q, Count
 from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.template import RequestContext
 from django.views.decorators.http import require_POST
@@ -6,11 +5,11 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
-from proposals.models import Proposal
-from review.forms import ReviewForm, ReviewCommentForm, SpeakerCommentForm
-from review.models import ReviewAssignment, Review, LatestVote, VOTES
+from symposion.proposals.models import Proposal
+from symposion.review.forms import ReviewForm, SpeakerCommentForm
+from symposion.review.models import ReviewAssignment, Review, LatestVote
 
-from pycon_project.utils import send_email
+from symposion.proposals.views import send_email
 
 
 def access_not_permitted(request):
@@ -74,47 +73,6 @@ def review_list(request, username=None):
         queryset = queryset.filter(pk__in=reviewed)
     queryset = queryset.order_by("submitted")
     
-    # filter out tutorials for now
-    queryset = queryset.exclude(session_type=Proposal.SESSION_TYPE_TUTORIAL)
-    
-    admin = request.user.groups.filter(name="reviewers-admins").exists()
-    
-    proposals = group_proposals(proposals_generator(request, queryset, username=username, check_speaker=not admin))
-    
-    ctx = {
-        "proposals": proposals,
-        "username": username,
-    }
-    ctx = RequestContext(request, ctx)
-    return render_to_response("reviews/review_list.html", ctx)
-
-
-@login_required
-def review_tutorial_list(request, username=None):
-    
-    # @@@ eventually this will be better integrated with the view above, but
-    # for now this allows for separate tutorial reviews with a separate group
-    # of reviewers, per PyCon's requirements
-    
-    if username:
-        # if they're not a reviewer admin and they aren't the person whose
-        # review list is being asked for, don't let them in
-        if not request.user.groups.filter(name="reviewers-admins").exists():
-            if not request.user.username == username:
-                return access_not_permitted(request)
-    else:
-        if not request.user.groups.filter(name="reviewers-tutorials").exists():
-            return access_not_permitted(request)
-    
-    queryset = Proposal.objects.select_related("speaker__user", "result")
-    if username:
-        reviewed = LatestVote.objects.filter(user__username=username).values_list("proposal", flat=True)
-        queryset = queryset.filter(pk__in=reviewed)
-    queryset = queryset.order_by("submitted")
-    
-    # this time, it's ONLY the tutorials
-    queryset = queryset.filter(session_type=Proposal.SESSION_TYPE_TUTORIAL)
-    
     admin = request.user.groups.filter(name="reviewers-admins").exists()
     
     proposals = group_proposals(proposals_generator(request, queryset, username=username, check_speaker=not admin))
@@ -170,12 +128,8 @@ def review_detail(request, pk):
     admin = request.user.groups.filter(name="reviewers-admins").exists()
     speakers = [s.user for s in proposal.speakers()]
     
-    if proposal.session_type == Proposal.SESSION_TYPE_TUTORIAL:
-        if not request.user.groups.filter(name="reviewers-tutorials").exists():
-            return access_not_permitted(request)
-    else:
-        if not request.user.groups.filter(name="reviewers").exists():
-            return access_not_permitted(request)
+    if not request.user.groups.filter(name="reviewers").exists():
+        return access_not_permitted(request)
     
     if not admin and request.user in speakers:
         return access_not_permitted(request)

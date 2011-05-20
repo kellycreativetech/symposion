@@ -19,6 +19,7 @@ from symposion.schedule.cache import db, cache_key_user
 from symposion.schedule.forms import PlenaryForm, RecessForm, PresentationForm
 from symposion.schedule.models import Slot, Presentation, Track, Session, SessionRole, UserBookmark
 
+from symposion.proposals.models import ProposalKind
 
 wed_morn_start = datetime.datetime(2011, 3, 9, 9, 0)  # 9AM Eastern
 wed_morn_end = datetime.datetime(2011, 3, 9, 12, 20)  # 12:20PM Eastern
@@ -71,39 +72,12 @@ def schedule_presentation(request, presentation_id, template_name="schedule/pres
     }, **extra_context), context_instance=RequestContext(request))
 
 
-def schedule_list_talks(request):
-    
-    talks = Presentation.objects.filter(
-        presentation_type__in=[Presentation.PRESENTATION_TYPE_PANEL, Presentation.PRESENTATION_TYPE_TALK]
-    )
-    talks = talks.order_by("pk")
+def schedule_list_by_kind(request, kind_slug):
+    kind = get_object_or_404(ProposalKind, slug=kind_slug)
+    talks = Presentation.objects.filter(presentation_type=kind).order_by("pk")
     
     return render_to_response("schedule/list_talks.html", dict({
         "talks": talks,
-    }), context_instance=RequestContext(request))
-
-
-def schedule_list_tutorials(request):
-    
-    tutorials = Presentation.objects.filter(
-        presentation_type=Presentation.PRESENTATION_TYPE_TUTORIAL
-    )
-    tutorials = tutorials.order_by("pk")
-    
-    return render_to_response("schedule/list_tutorials.html", dict({
-        "tutorials": tutorials,
-    }), context_instance=RequestContext(request))
-
-
-def schedule_list_posters(request):
-    
-    posters = Presentation.objects.filter(
-        presentation_type=Presentation.PRESENTATION_TYPE_POSTER
-    )
-    posters = posters.order_by("pk")
-    
-    return render_to_response("schedule/list_posters.html", dict({
-        "posters": posters,
     }), context_instance=RequestContext(request))
 
 
@@ -461,7 +435,7 @@ def schedule_export_speaker_data(request):
 
 def schedule_export_panels(request):
     data = ""
-    for presentation in Presentation.objects.filter(presentation_type=Presentation.PRESENTATION_TYPE_PANEL):
+    for presentation in Presentation.objects.filter(presentation_type__slug="panel"):
         data += "%s\n" % presentation.title
     return HttpResponse(data, content_type="text/plain;charset=UTF-8")
 

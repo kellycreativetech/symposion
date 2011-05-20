@@ -9,6 +9,7 @@ from biblion import creole_parser
 class ProposalKind(models.Model):
     
     name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=100)
     start = models.DateTimeField(null=True, blank=True)
     end = models.DateTimeField(null=True, blank=True)
     closed = models.NullBooleanField()
@@ -58,6 +59,7 @@ class Proposal(models.Model):
     speaker = models.ForeignKey("speakers.Speaker", related_name="proposals")
     additional_speakers = models.ManyToManyField("speakers.Speaker", blank=True)
     cancelled = models.BooleanField(default=False)
+    invited = models.BooleanField(default=False)
     
     def save(self, *args, **kwargs):
         self.abstract_html = creole_parser.parse(self.abstract)
