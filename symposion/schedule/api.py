@@ -14,17 +14,17 @@ class PlenaryResource(ModelResource):
         available_methods = ["get",]
 
 class PresentationResource(ModelResource):
-    speaker = fields.ToOneField("symposion.api.SpeakerResource", "speaker", full=true, null=True)
-    additional_speakers = fields.ToManyField("symposion.api.SpeakerResource", "additional_speakers", full=True, null=True)
+    speaker = fields.ToOneField("symposion.speakers.api.SpeakerResource", "speaker", full=True, null=True)
+    additional_speakers = fields.ToManyField("symposion.speakers.api.SpeakerResource", "additional_speakers", full=True, null=True)
     
     class Meta:
         queryset = Presentation.objects.all()
         available_methods = ["get",]
 
 class SlotResource(ModelResource):
-    presentation = fields.ToOneField("symposion.api.PresentationResource", "presentation", full=true, null=True)
-    recess = fields.ToOneField("symposion.api.RecessResource", "recess", full=true, null=True)
-    plenary = fields.ToOneField("symposion.api.PlenaryResource", "plenary", full=true, null=True)
+    presentation = fields.ToOneField("symposion.schedule.api.PresentationResource", "presentation", full=True, null=True)
+    recess = fields.ToOneField("symposion.schedule.api.RecessResource", "recess", full=True, null=True)
+    plenary = fields.ToOneField("symposion.schedule.api.PlenaryResource", "plenary", full=True, null=True)
     
     class Meta:
         queryset = Slot.objects.all()
