@@ -17,7 +17,7 @@ from django.contrib.auth.models import User
 
 from symposion.schedule.cache import db, cache_key_user
 from symposion.schedule.forms import PlenaryForm, RecessForm, PresentationForm
-from symposion.schedule.models import Slot, Presentation, Track, Session, SessionRole, UserBookmark
+from symposion.schedule.models import Slot, Presentation, Track, Session, SessionRole, UserBookmark, Plenary
 
 from symposion.proposals.models import ProposalKind
 
@@ -453,7 +453,7 @@ def schedule_json(request):
 
     data = []
     for slot in slots:
-        if slot.presentation:
+        try:
             tags = []
             tags.append(slot.presentation.presentation_type.slug)
             tags.append(Presentation.AUDIENCE_LEVELS[slot.presentation.audience_level - 1][1].lower())
@@ -473,23 +473,26 @@ def schedule_json(request):
                 "tags": ", ".join(tags),
                 "last_updated": slot.presentation.last_updated,
             })
-        elif slot.plenary:
-            data.append({
-                "room": "Plenary",
-                "start": slot.start,
-                "duration": (slot.end - slot.start).seconds // 60,
-                "end": slot.end,
-                "title": slot.plenary.title,
-                "presenters": ", ".join(map(
-                    lambda s: s.name,
-                    slot.plenary.speakers()
-                )),
-                "description": slot.plenary.description,
-                "id": slot.pk,
-                "url": None,
-                "tags": "plenary",
-                "last_updated": slot.plenary.last_updated,
-            })
+        except Presentation.DoesNotExist:
+            try: 
+                data.append({
+                    "room": "Plenary",
+                    "start": slot.start,
+                    "duration": (slot.end - slot.start).seconds // 60,
+                    "end": slot.end,
+                    "title": slot.plenary.title,
+                    "presenters": ", ".join(map(
+                        lambda s: s.name if s else "",
+                        slot.plenary.speakers()
+                    )),
+                    "description": slot.plenary.description,
+                    "id": slot.pk,
+                    "url": None,
+                    "tags": "plenary",
+                    "last_updated": slot.plenary.last_updated,
+                })
+            except Plenary.DoesNotExist:
+                pass
     
     return HttpResponse(
         json.dumps(data, default=json_serializer),

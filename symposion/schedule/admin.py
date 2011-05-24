@@ -1,7 +1,13 @@
 from django.contrib import admin
 
-from symposion.schedule.models import SessionRole, Presentation, Slot, Session, Track
+from symposion.schedule.models import SessionRole, Presentation, Slot, Session, Track, Plenary
 
+admin.site.register(Plenary,
+    list_display = [
+        "title",
+        "slot"
+    ],
+)
 
 admin.site.register(Session)
 admin.site.register(SessionRole,
@@ -21,7 +27,6 @@ admin.site.register(Presentation,
     list_display = [
         "title",
         "slot",
-        "presentation_type",
         "audience_level",
         "cancelled"
     ],
