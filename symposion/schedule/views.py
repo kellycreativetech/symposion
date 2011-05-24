@@ -35,9 +35,17 @@ WEDNESDAY_AFTERNOON = (wed_after_start, wed_after_end)
 THURSDAY_MORNING = (thu_morn_start, thu_morn_end)
 THURSDAY_AFTERNOON = (thu_after_start, thu_after_end)
 
+from django.utils import simplejson as json
+
 
 def hash_for_user(user):
     return hashlib.sha224(settings.SECRET_KEY + user.username).hexdigest()
+
+
+def json_serializer(obj):
+    if isinstance(obj, datetime.datetime):
+        return [obj.year, obj.month, obj.day, obj.hour, obj.minute]
+    raise TypeError
 
 
 def schedule_list(request, template_name="schedule/schedule_list.html", extra_context=None):
@@ -438,6 +446,55 @@ def schedule_export_panels(request):
     for presentation in Presentation.objects.filter(presentation_type__slug="panel"):
         data += "%s\n" % presentation.title
     return HttpResponse(data, content_type="text/plain;charset=UTF-8")
+
+
+def schedule_json(request):
+    slots = Slot.objects.all().order_by("start")
+
+    data = []
+    for slot in slots:
+        if slot.presentation:
+            tags = []
+            tags.append(slot.presentation.presentation_type.slug)
+            tags.append(Presentation.AUDIENCE_LEVELS[slot.presentation.audience_level - 1][1].lower())
+            data.append({
+                "room": slot.track.name,
+                "start": slot.start,
+                "duration": (slot.end - slot.start).seconds // 60,
+                "end": slot.end,
+                "title": slot.presentation.title,
+                "presenters": ", ".join(map(
+                    lambda s: s.name,
+                    slot.presentation.speakers()
+                )),
+                "description": slot.presentation.description,
+                "id": slot.pk,
+                "url": slot.presentation.get_absolute_url(),
+                "tags": ", ".join(tags),
+                "last_updated": slot.presentation.last_updated,
+            })
+        elif slot.plenary:
+            data.append({
+                "room": "Plenary",
+                "start": slot.start,
+                "duration": (slot.end - slot.start).seconds // 60,
+                "end": slot.end,
+                "title": slot.plenary.title,
+                "presenters": ", ".join(map(
+                    lambda s: s.name,
+                    slot.plenary.speakers()
+                )),
+                "description": slot.plenary.description,
+                "id": slot.pk,
+                "url": None,
+                "tags": "plenary",
+                "last_updated": slot.plenary.last_updated,
+            })
+    
+    return HttpResponse(
+        json.dumps(data, default=json_serializer),
+        content_type="application/json"
+    )
 
 
 def schedule_user_bookmarks(request, user_id, user_hash):

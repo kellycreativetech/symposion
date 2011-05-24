@@ -12,8 +12,9 @@ from symposion.proposals.models import ProposalKind
 
 
 class Track(models.Model):
-    
+
     name = models.CharField(max_length=65)
+    last_updated = models.DateTimeField(auto_now=True)
     
     def __unicode__(self):
         return self.name
@@ -22,6 +23,7 @@ class Track(models.Model):
 class Session(models.Model):
     
     track = models.ForeignKey(Track, null=True, related_name="sessions")
+    last_updated = models.DateTimeField(auto_now=True)
     
     def sorted_slots(self):
         ct = ContentType.objects.get_for_model(Presentation)
@@ -85,6 +87,7 @@ class Slot(models.Model):
     kind = models.ForeignKey(ContentType, null=True, blank=True)
     track = models.ForeignKey(Track, null=True, blank=True, related_name="slots")
     session = models.ForeignKey(Session, null=True, blank=True, related_name="slots")
+    last_updated = models.DateTimeField(auto_now=True)
     
     def content(self):
         if self.kind_id:
@@ -110,6 +113,7 @@ class Slot(models.Model):
     
     def __unicode__(self):
         return u"%s %s: %s — %s" % (
+            self.track,
             self.start.strftime("%a"),
             self.start.strftime("%X"),
             self.end.strftime("%X")
@@ -148,6 +152,7 @@ class Presentation(models.Model):
     additional_speakers = models.ManyToManyField("speakers.Speaker", blank=True)
     cancelled = models.BooleanField(default=False)
     invited = models.BooleanField(default=False)
+    last_updated = models.DateTimeField(auto_now=True)
     
     def save(self, *args, **kwargs):
         self.abstract_html = creole_parser.parse(self.abstract)
@@ -160,6 +165,10 @@ class Presentation(models.Model):
     
     def __unicode__(self):
         return u"%s" % self.title
+    
+    @models.permalink
+    def get_absolute_url(self):
+        return ("symposion.schedule.views.schedule_presentation", [str(self.pk),])
 
 
 class Plenary(models.Model):
@@ -169,6 +178,12 @@ class Plenary(models.Model):
     speaker = models.ForeignKey("speakers.Speaker", null=True, blank=True, related_name="+")
     additional_speakers = models.ManyToManyField("speakers.Speaker", blank=True)
     description = models.TextField(max_length=400, blank=True)
+    last_updated = models.DateTimeField(auto_now=True)
+    
+    def speakers(self):
+        yield self.speaker
+        for speaker in self.additional_speakers.all():
+            yield speaker
 
 
 class Recess(models.Model):
@@ -180,6 +195,7 @@ class Recess(models.Model):
     slot = models.OneToOneField(Slot, null=True, blank=True, related_name="recess")
     title = models.CharField(max_length=100)
     description = models.TextField(max_length=400, blank=True)
+    last_updated = models.DateTimeField(auto_now=True)
 
 
 class UserBookmark(models.Model):
