@@ -8,7 +8,7 @@ urlpatterns = patterns("symposion.schedule.views",
     url(r"^index/$", direct_to_template, {"template": "schedule/index.html"}, name="schedule_index"),
     
     # For Posterity in the Templates, could be temporary
-    url(r"^lists/talks/", "schedule_list_by_kind", kwargs={"kind_slug": "talk"}, name="schedule_list_talks"),
+    url(r"^lists/talks/", "schedule_list_by_kind", kwargs={"kind_slug": "talks"}, name="schedule_list_talks"),
     url(r"^lists/tutorials/", "schedule_list_by_kind", kwargs={"kind_slug": "tutorials"}, name="schedule_list_tutorials"),
     url(r"^lists/posters/", "schedule_list_by_kind", kwargs={"kind_slug": "posters"}, name="schedule_list_posters"),
     url(r"^lists/(?P<kind_slug>[\w\-\_]+)/", "schedule_list_by_kind", name="schedule_list_by_kind"),
