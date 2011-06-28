@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Registrant(models.Model):
+    NOSHIRT = -1
     TSHIRT_M_S = 1
     TSHIRT_M_M = 2
     TSHIRT_M_L = 3
@@ -12,6 +13,7 @@ class Registrant(models.Model):
     TSHIRT_W_L = 8
     TSHIRT_W_XL = 9
     TSHIRTS = (
+        (NOSHIRT, "Bots Don't Wear Clothes"),
         (TSHIRT_M_S, "Men's Small"),
         (TSHIRT_M_M, "Men's Medium"),
         (TSHIRT_M_L, "Men's Large"),
@@ -28,5 +30,6 @@ class Registrant(models.Model):
     last_name = models.CharField(max_length=64)
     email = models.EmailField()
     will_buy_tshirt = models.BooleanField("I would buy a T-Shirt", default=True, help_text="We're looking for a T-shirt sponsor, but if we don't get one, we'll be asking for cash.")
-    tshirt_size = models.SmallIntegerField("T-Shirt Size", choices=TSHIRTS)
+    tshirt_size = models.SmallIntegerField("T-Shirt Size", choices=TSHIRTS, help_text="Please pick a size, we're looking for a sponsor, and hope the shirts will be included with registration. First option is for non-humans only.")
+    remote_ip = models.IPAddressField(blank=True, null=True)
     location = models.CharField(max_length=128, blank=True, null=True)
