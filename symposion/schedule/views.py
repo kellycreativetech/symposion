@@ -14,6 +14,7 @@ from django.template import RequestContext
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 
 from symposion.schedule.cache import db, cache_key_user
 from symposion.schedule.forms import PlenaryForm, RecessForm, PresentationForm
@@ -34,6 +35,8 @@ WEDNESDAY_MORNING = (wed_morn_start, wed_morn_end)
 WEDNESDAY_AFTERNOON = (wed_after_start, wed_after_end)
 THURSDAY_MORNING = (thu_morn_start, thu_morn_end)
 THURSDAY_AFTERNOON = (thu_after_start, thu_after_end)
+
+CONFERENCE_TAGS = getattr(settings, "CONFERENCE_TAGS", [])
 
 from django.utils import simplejson as json
 
@@ -458,6 +461,7 @@ def schedule_json(request):
             tags = []
             tags.append(slot.presentation.presentation_type.slug)
             tags.append(Presentation.AUDIENCE_LEVELS[slot.presentation.audience_level - 1][1].lower())
+            tags.extend(CONFERENCE_TAGS)
             data.append({
                 "room": slot.track.name,
                 "start": slot.start,
@@ -469,8 +473,9 @@ def schedule_json(request):
                     slot.presentation.speakers()
                 )),
                 "description": slot.presentation.description,
+                "abstract": slot.presentation.abstract,
                 "id": slot.pk,
-                "url": slot.presentation.get_absolute_url(),
+                "url": "http://%s%s" % (Site.objects.get_current().domain, slot.presentation.get_absolute_url()),
                 "tags": ", ".join(tags),
                 "last_updated": slot.presentation.last_updated,
             })
@@ -487,6 +492,7 @@ def schedule_json(request):
                         slot.plenary.speakers()
                     )),
                     "description": slot.plenary.description,
+                    "abstract": None,
                     "id": slot.pk,
                     "url": None,
                     "tags": "plenary",
