@@ -20,7 +20,7 @@ admin.site.register(Track,
 )
 
 admin.site.register(Slot,
-    list_display = ["pk", "start", "end", "track"]
+    list_display = ["pk", "start", "end", "track", "session"]
 )
 
 admin.site.register(Presentation,

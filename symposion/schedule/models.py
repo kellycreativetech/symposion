@@ -49,12 +49,14 @@ class Session(models.Model):
         start = self.start()
         end = self.end()
         if start and end:
-            return u"%s: %s — %s" % (
+            return u"%s %s %s: %s — %s" % (
+                self.id,
+                self.track.name,
                 start.strftime("%a"),
                 start.strftime("%X"),
                 end.strftime("%X")
             )
-        return u""
+        return u"%s %s" % (self.id, self.track.name)
 
 
 class SessionRole(models.Model):
@@ -118,6 +120,9 @@ class Slot(models.Model):
             self.start.strftime("%X"),
             self.end.strftime("%X")
         )
+    
+    class Meta:
+        ordering = ["start", "track__name"]
 
 
 class Presentation(models.Model):
