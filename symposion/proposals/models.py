@@ -56,6 +56,10 @@ class Proposal(models.Model):
         default = datetime.datetime.now,
         editable = False,
     )
+    edited = models.DateTimeField(
+        auto_now = True,
+        null = True
+    )
     speaker = models.ForeignKey("speakers.Speaker", related_name="proposals")
     additional_speakers = models.ManyToManyField("speakers.Speaker", blank=True)
     cancelled = models.BooleanField(default=False)
