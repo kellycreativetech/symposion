@@ -47,7 +47,7 @@ def hash_for_user(user):
 
 def json_serializer(obj):
     if isinstance(obj, datetime.datetime):
-        return [obj.year, obj.month, obj.day, obj.hour, obj.minute]
+        return list(obj.timetuple())
     raise TypeError
 
 
@@ -468,6 +468,7 @@ def schedule_json(request):
                 "duration": (slot.end - slot.start).seconds // 60,
                 "end": slot.end,
                 "title": slot.presentation.title,
+                "name": slot.presentation.title,
                 "presenters": ", ".join(map(
                     lambda s: s.name,
                     slot.presentation.speakers()
@@ -478,6 +479,20 @@ def schedule_json(request):
                 "url": "http://%s%s" % (Site.objects.get_current().domain, slot.presentation.get_absolute_url()),
                 "tags": ", ".join(tags),
                 "last_updated": slot.presentation.last_updated,
+                
+                # Add some fields for Carl
+                "license": "",
+                "conf_url": "",
+                "conf_key": "",
+                "released": True,
+                "start_iso": slot.start.isoformat(),
+                "end_iso": slot.end.isoformat(),
+                "authors": ", ".join(map(
+                    lambda s: s.name,
+                    slot.presentation.speakers()
+                )),
+                "last_updated_iso": slot.presentation.last_updated.isoformat(),
+                "contact": "", # not sure if this is ok to be shared.
             })
         except Presentation.DoesNotExist:
             try: 
@@ -487,6 +502,7 @@ def schedule_json(request):
                     "duration": (slot.end - slot.start).seconds // 60,
                     "end": slot.end,
                     "title": slot.plenary.title,
+                    "name": slot.plenary.title,
                     "presenters": ", ".join(map(
                         lambda s: s.name if s else "",
                         slot.plenary.speakers()
@@ -497,6 +513,21 @@ def schedule_json(request):
                     "url": None,
                     "tags": "plenary",
                     "last_updated": slot.plenary.last_updated,
+
+                    # Add some fields for Carl
+                    "license": "",
+                    "conf_url": "",
+                    "conf_key": "",
+                    "start_iso": slot.start.isoformat(),
+                    "end_iso": slot.end.isoformat(),
+                    "released": True,
+                    "authors": ", ".join(map(
+                        lambda s: s.name if s else "",
+                        slot.plenary.speakers()
+                    )),
+                    "last_updated_iso": slot.plenary.last_updated,
+                    "contact": "", # not sure if this is ok to be shared.
+                    
                 })
             except Plenary.DoesNotExist:
                 pass
