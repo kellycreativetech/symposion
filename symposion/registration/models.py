@@ -8,6 +8,7 @@ class Registrant(models.Model):
     TSHIRT_M_L = 3
     TSHIRT_M_XL = 4
     TSHIRT_M_XXL = 5
+    TSHIRT_M_XXXL = 10
     TSHIRT_W_S = 6
     TSHIRT_W_M = 7
     TSHIRT_W_L = 8
@@ -19,6 +20,7 @@ class Registrant(models.Model):
         (TSHIRT_M_L, "Men's Large"),
         (TSHIRT_M_XL, "Men's Extra Large"),
         (TSHIRT_M_XXL, "Men's 2X Large"),
+        (TSHIRT_M_XXXL, "Men's 3X Large"),
         (TSHIRT_W_S, "Women's Small"),
         (TSHIRT_W_M, "Women's Medium"),
         (TSHIRT_W_L, "Women's Large"),
