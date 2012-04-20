@@ -35,4 +35,4 @@ class Registrant(models.Model):
     tshirt_size = models.SmallIntegerField("T-Shirt Size", choices=TSHIRTS,
         help_text="""We will ask for a $20 donation to support PyOhio when you pick up your t-shirt. Alternately please consider volunteering time. Only if you are willing to donate.""")
     remote_ip = models.IPAddressField(blank=True, null=True)
-    location = models.CharField(max_length=128, blank=True, null=True)
+    location = models.CharField(help_text="City, and State or Country", max_length=128, blank=True, null=True)
