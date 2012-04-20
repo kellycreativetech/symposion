@@ -31,7 +31,8 @@ class Registrant(models.Model):
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
     email = models.EmailField()
-    will_buy_tshirt = models.BooleanField("I would buy a T-Shirt", default=True, help_text="We're looking for a T-shirt sponsor, but if we don't get one, we'll be asking for cash.")
+    will_buy_tshirt = models.BooleanField("I would buy a T-Shirt", help_text="We're looking for a T-shirt sponsor, but if we don't get one, we'll be asking for cash.")
+    will_volunteer = models.BooleanField("Contact me, I'd like to voluteer", help_text="")
     tshirt_size = models.SmallIntegerField("T-Shirt Size", choices=TSHIRTS,
         help_text="""We will ask for a $20 donation to support PyOhio when you pick up your t-shirt. Alternately please consider volunteering time. Only if you are willing to donate.""")
     remote_ip = models.IPAddressField(blank=True, null=True)
