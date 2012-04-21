@@ -1,5 +1,8 @@
 from django import forms
 from symposion.registration.models import Registrant
+try:            # Add recaptcha support if django-recaptcha is installed
+    from captcha.fields import ReCaptchaField
+except ImportError: pass
 
 
 class RegistrantForm(forms.ModelForm):
@@ -10,6 +13,9 @@ class RegistrantForm(forms.ModelForm):
             self.ip = ip
             print ip
         super(RegistrantForm, self).__init__(*args, **kwargs)
+        try:    # Add recaptcha support if django-recaptcha is installed
+            self.fields['captcha'] = ReCaptchaField()
+        except NameError: pass
     
     def save(self, *args, **kwargs):
         if self.ip:
