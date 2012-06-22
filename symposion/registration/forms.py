@@ -26,7 +26,16 @@ class RegistrantForm(forms.ModelForm):
             return registrant
         else:
             return super(RegistrantForm, self).save(*args, **kwargs)
-    
+
+    def clean(self):
+        cleaned_data = super(RegistrantForm, self).clean()
+        if not cleaned_data['will_buy_tshirt']:
+            cleaned_data['tshirt_size'] = -1
+        elif cleaned_data['tshirt_size'] == -1:
+            self._errors['tshirt_size'] = self.error_class([
+                "You must select a t-shirt size"])
+        return cleaned_data
+
     class Meta:
         model = Registrant
         fields = ('first_name', 'last_name', 'email', 'will_buy_tshirt',
