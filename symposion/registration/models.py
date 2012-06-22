@@ -14,7 +14,7 @@ class Registrant(models.Model):
     TSHIRT_W_L = 8
     TSHIRT_W_XL = 9
     TSHIRTS = (
-        (NOSHIRT, "Bots Don't Wear Clothes"),
+        (NOSHIRT, "Select a size"),
         (TSHIRT_M_S, "Men's Small"),
         (TSHIRT_M_M, "Men's Medium"),
         (TSHIRT_M_L, "Men's Large"),
@@ -33,7 +33,7 @@ class Registrant(models.Model):
     email = models.EmailField()
     will_buy_tshirt = models.BooleanField("I would buy a T-Shirt", help_text="We're looking for a T-shirt sponsor, but if we don't get one, we'll be asking for cash.")
     will_volunteer = models.BooleanField("Contact me, I'd like to voluteer", help_text="")
-    tshirt_size = models.SmallIntegerField("T-Shirt Size", choices=TSHIRTS,
+    tshirt_size = models.SmallIntegerField("T-Shirt Size", default=-1, choices=TSHIRTS,
         help_text="""We will ask for a $20 donation to support PyOhio when you pick up your t-shirt. Alternately please consider volunteering time. Only if you are willing to donate.""")
     remote_ip = models.IPAddressField(blank=True, null=True)
     location = models.CharField(help_text="City, and State or Country", max_length=128, blank=True, null=True)
